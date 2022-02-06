@@ -2,6 +2,18 @@
 <html lang="en">
   <head>
     <title>PiggyWatchdogClub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"></script>
+    <style>html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+    }
+    
+    #canvas {
+      width: 100%;
+      height: 100%;
+    }</style>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +23,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="images/x-icon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="images/x-icon/favicon-16x16.png">
     <link rel="manifest" href="images/x-icon/site.webmanifest">
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <header>
@@ -37,7 +49,7 @@
             <img src="images/header/twitter.webp" alt="Twitter" />
           </a>
           <a
-            href="https://opensea.io/Piggy_Watchdog_Club"
+            href="https://opensea.io/collection/piggy-watchdog-club-1"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -51,15 +63,13 @@
     </header>
 
     <section class="container">
-    </ul>
-  
-    <h1 style="text-align:center;">Welcome to Piggy Watchdog Club (PWC)</h1>
-    
+      
+      <div class="owner-status"></div>
       <div class="countdown">
         <ul
           id="countdown"
           class="count-down"
-          data-date="March 10, 2022 4:00:00 PM UTC"
+          data-date="Feb 17, 2022 4:00:00 PM UTC"
         >
           <li class="clock-item">
             <span class="count-number days">20</span>
@@ -81,17 +91,302 @@
             <p class="count-text">Sec</p>
           </li>
         </ul>
-        <h1>PWC NFT Drop Landing Soon!!</h1>
+        <h1>PW Club NFT Drop Landing Soon!!</h1>
                
-        <p>A new batch of unique piggy watchdogs will be available very soon!</p>
+        <p>A new batch of 4,444 unique Piggy Watchdogs will be available very soon for you to Mint!</p>
         <a href="https://discord.gg/yDwvcnzX" target="_blank" rel="noopener noreferrer" class="hero-btn btn"
-          ><span>Join The PWC-community </span>
+          ><span> Join the PWCommunity </span>
         </a>
-        
       </div>
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/@metamask/onboarding@1.0.1/dist/metamask-onboarding.bundle.js"></script>
-    <script src="app.js"></script>
+    <script src="js/countdown.js"></script>
+    <script src="js/app.js"></script>
+
+    <html>
+    <head>
+        <title>canvas</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"></script>
+        <style>html, body {
+            height: 80%;
+          }
+          body {
+            margin: 0;
+          }
+          
+          #canvas {
+            width: 100%;
+            height: 100%;
+          }</style>
+    </head>
+    <body>
+       <canvas id="canvas"></canvas>
+    </body>
+    <script>
+        console.clear()
+console.log('lsakdfalskjdflnksd')
+
+
+const config = {
+  src: './sprite_sheet.png',
+  rows: 15,
+  cols: 7
+}
+
+// UTILS
+
+const randomRange = (min, max) => min + Math.random() * (max - min)
+
+const randomIndex = (array) => randomRange(0, array.length) | 0
+
+const removeFromArray = (array, i) => array.splice(i, 1)[0]
+
+const removeItemFromArray = (array, item) => removeFromArray(array, array.indexOf(item))
+
+const removeRandomFromArray = (array) => removeFromArray(array, randomIndex(array))
+
+const getRandomFromArray = (array) => (
+  array[randomIndex(array) | 0]
+)
+
+// TWEEN FACTORIES
+
+const resetPeep = ({ stage, peep }) => {
+  const direction = Math.random() > 0.5 ? 1 : -1
+  // using an ease function to skew random to lower values to help hide that peeps have no legs
+  const offsetY = 100 - 250 * gsap.parseEase('power2.in')(Math.random())
+  const startY = stage.height - peep.height + offsetY
+  let startX
+  let endX
+  
+  if (direction === 1) {
+    startX = -peep.width
+    endX = stage.width
+    peep.scaleX = 1
+  } else {
+    startX = stage.width + peep.width
+    endX = 0
+    peep.scaleX = -1
+  }
+  
+  peep.x = startX
+  peep.y = startY
+  peep.anchorY = startY
+  
+  return {
+    startX,
+    startY,
+    endX
+  }
+}
+
+const normalWalk = ({ peep, props }) => {
+  const {
+    startX,
+    startY,
+    endX
+  } = props
+
+  const xDuration = 10
+  const yDuration = 0.25
+  
+  const tl = gsap.timeline()
+  tl.timeScale(randomRange(0.5, 1.5))
+  tl.to(peep, {
+    duration: xDuration,
+    x: endX,
+    ease: 'none'
+  }, 0)
+  tl.to(peep, {
+    duration: yDuration,
+    repeat: xDuration / yDuration,
+    yoyo: true,
+    y: startY - 10
+  }, 0)
+    
+  return tl
+}
+
+const walks = [
+  normalWalk,
+]
+
+// CLASSES
+
+class Peep {
+  constructor({
+    image,
+    rect,
+  }) {
+    this.image = image
+    this.setRect(rect)
+    
+    this.x = 0
+    this.y = 0
+    this.anchorY = 0
+    this.scaleX = 1
+    this.walk = null
+  }
+  
+  setRect (rect) {
+    this.rect = rect
+    this.width = rect[2]
+    this.height = rect[3]
+    
+    this.drawArgs = [
+      this.image,
+      ...rect,
+      0, 0, this.width, this.height
+    ]  
+  }
+  
+  render (ctx) {
+    ctx.save()
+    ctx.translate(this.x, this.y)
+    ctx.scale(this.scaleX, 1)
+    ctx.drawImage(...this.drawArgs)
+    ctx.restore()
+  }
+}
+
+// MAIN
+
+const img = document.createElement('img')
+img.onload = init
+img.src = config.src
+
+const canvas = document.querySelector('#canvas')
+const ctx = canvas.getContext('2d')
+
+const stage = {
+  width: 0,
+  height: 0,
+}
+
+const allPeeps = []
+const availablePeeps = []
+const crowd = []
+
+function init () {  
+  createPeeps()
+  
+  // resize also (re)populates the stage
+  resize()
+
+  gsap.ticker.add(render)
+  window.addEventListener('resize', resize)
+}
+
+function createPeeps () {
+  const {
+    rows,
+    cols
+  } = config
+  const {
+    naturalWidth: width,
+    naturalHeight: height
+  } = img
+  const total = rows * cols
+  const rectWidth = width / rows
+  const rectHeight = height / cols
+  
+  for (let i = 0; i < total; i++) {
+    allPeeps.push(new Peep({
+      image: img,
+      rect: [
+        (i % rows) * rectWidth,
+        (i / rows | 0) * rectHeight,
+        rectWidth,
+        rectHeight,
+      ]
+    }))
+  }  
+}
+
+function resize () {
+  stage.width = canvas.clientWidth
+  stage.height = canvas.clientHeight
+  canvas.width = stage.width * devicePixelRatio
+  canvas.height = stage.height * devicePixelRatio
+  
+  crowd.forEach((peep) => {
+    peep.walk.kill()
+  })
+  
+  crowd.length = 0
+  availablePeeps.length = 0
+  availablePeeps.push(...allPeeps)
+  
+  initCrowd()
+}
+
+function initCrowd () {
+  while (availablePeeps.length) {
+    // setting random tween progress spreads the peeps out
+    addPeepToCrowd().walk.progress(Math.random())
+  }
+}
+
+function addPeepToCrowd () {
+  const peep = removeRandomFromArray(availablePeeps)
+  const walk = getRandomFromArray(walks)({
+    peep,
+    props: resetPeep({
+      peep,
+      stage,
+    })
+  }).eventCallback('onComplete', () => {
+    removePeepFromCrowd(peep)
+    addPeepToCrowd()
+  })
+  
+  peep.walk = walk
+  
+  crowd.push(peep)
+  crowd.sort((a, b) => a.anchorY - b.anchorY)
+  
+  return peep
+}
+
+function removePeepFromCrowd (peep) {
+  removeItemFromArray(crowd, peep)
+  availablePeeps.push(peep)
+}
+
+function render () {
+  canvas.width = canvas.width
+  ctx.save()
+  ctx.scale(devicePixelRatio, devicePixelRatio)
+  
+  crowd.forEach((peep) => {
+    peep.render(ctx)
+  })
+  
+  ctx.restore()
+}
+    </script>
+
+   <body>
+    <br/>
+    <br/>
+    <div> 
+      <h2><center>About</center></h2>
+      <br/>
+      <p><center>PW Club is a collection of 4,444 unique Piggy Watchdog NFTs with unique digital collectibles living on the Polygon blockchain. They were created by Almpano Damo, a Security & Crime Science graduate using 3D computer graphics software to computer generate this collection that has 200+ various and unique traits, using an erc-721 contract.</p></center>
+    </div>
+    <br/>
+
+    <center><img src="./random.gif" width="270" height="270"></center>
+    
+    <div class="w3-container"> 
+      <h2>With a Container</h2>
+      <p>The w3-container class is one of the most important W3.CSS classes.</p>
+      <p>It provides correct margins, padding, alignments, and more, to most HTML elements.</p>
+    </div>
+    
+    </body>
+    </html>
   </body>
+  
 </html>

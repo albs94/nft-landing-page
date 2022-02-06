@@ -8,11 +8,11 @@
   --font-primary: 'Poppins', sans-serif;
   --font-secondary: 'Arvo', serif;
   --font-code: 'Roboto', monospace;
-  --bg-color: #003B46;
-  --font-color: #C4DFE6;
-  --btn-bg-color: #66A5AD;
-  --accent-color: #07575B;
-  --header-shadow: rgb(129, 15, 15) 5px 5px 20px;
+  --bg-color: #000000;
+  --font-color: #ffffff;
+  --btn-bg-color: #FBEEC1;
+  --accent-color: #BC986A;
+  --header-shadow: rgb(0, 0, 0) 0px 0px 5px;
 }
 
 * {
@@ -31,6 +31,8 @@ body {
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
   max-width: 960px;
   margin: 0 auto;
   padding: 1rem 2rem;
@@ -43,7 +45,7 @@ header {
 }
 
 header .container {
-  display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
@@ -152,6 +154,15 @@ section {
   margin-bottom: 2rem;
   text-align: center;
 }
+
+/* OWNER STYLES */
+
+.owner-status {
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* MEDIA QUERIES */
 
 @media screen and (max-width: 768px) {
   .menu {
